@@ -10,7 +10,7 @@
       "name": "pinbridge",
       "source": "./",
       "description": "Publish, schedule and measure Pinterest pins from Claude through PinBridge. Connects the hosted PinBridge MCP server and teaches Claude the safe publishing workflow.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "category": "productivity",
       "homepage": "https://www.pinbridge.io/mcp/"
     }
