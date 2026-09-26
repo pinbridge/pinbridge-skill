@@ -2,7 +2,7 @@
 
 Publish, schedule and track Pinterest pins by asking Claude. The plugin connects Claude to the hosted PinBridge MCP server and adds a skill that tells Claude how to use it: dry run first, confirm with you, then publish, and never post the same pin twice on a retry.
 
-You need a PinBridge account (the free Playground plan works) with at least one Pinterest account connected in the [dashboard](https://app.pinbridge.io).
+You need a PinBridge account with at least one Pinterest account connected in the [dashboard](https://app.pinbridge.io). The free Playground plan works with images at a public URL. Uploading images or videos from your computer, and bulk publishing, need a paid plan.
 
 ## Install
 
@@ -22,10 +22,13 @@ Using a client without OAuth support? Point it at `https://mcp.pinbridge.io` and
 - "Pin this image to my Recipes board, linking to my post."
 - "Schedule these 20 pins over the next two weeks, two a day at 9am Casablanca time."
 - "Why did my last pin fail?"
+- "How did publishing go last week?"
 - "Which of last month's pins got the most clicks?"
-- "Move that pin to the Dinner Ideas board and fix the typo in the title."
+- "Move tomorrow's scheduled pin to the Dinner Ideas board and fix the typo in the title."
 
 Claude shows you the final title, description, link and board before anything goes out, and waits for your OK.
+
+Pinterest doesn't let apps edit a pin once it's live. To correct a published pin, Claude offers to delete it and publish a fixed one, and asks you first.
 
 ## What's in here
 
@@ -40,8 +43,16 @@ The plugin has no hooks and runs no local code. Everything goes through the host
 
 Connecting or disconnecting a Pinterest account stays in the dashboard. Pinterest needs you to approve that in a browser, and disconnecting drops every pending schedule on the account.
 
+## Other assistants
+
+The skill in `skills/pinterest-publishing/` doesn't depend on Claude. It's plain Markdown written against the PinBridge MCP server, so any assistant that can connect to `https://mcp.pinbridge.io` and load skills or custom instructions can use it.
+
 ## Links
 
 - [MCP docs](https://www.pinbridge.io/docs/mcp/)
 - [Usage policy](https://www.pinbridge.io/docs/mcp/usage-policy/)
 - [PinBridge](https://www.pinbridge.io)
+
+## License
+
+MIT. See [LICENSE](LICENSE).

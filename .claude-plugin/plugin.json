@@ -1,6 +1,6 @@
 {
   "name": "pinbridge",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Publish, schedule and measure Pinterest pins from Claude through PinBridge. Connects the hosted PinBridge MCP server and teaches Claude the safe publishing workflow.",
   "author": {
     "name": "PinBridge",
@@ -8,6 +8,7 @@
   },
   "homepage": "https://www.pinbridge.io/mcp/",
   "repository": "https://github.com/pinbridge/pinbridge-skill",
+  "license": "MIT",
   "keywords": [
     "pinterest",
     "pins",
