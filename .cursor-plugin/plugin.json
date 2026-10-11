@@ -1,0 +1,29 @@
+{
+  "name": "pinbridge",
+  "displayName": "PinBridge",
+  "version": "0.3.0",
+  "description": "Publish, schedule and measure Pinterest pins from Cursor through PinBridge. Connects the hosted PinBridge MCP server and teaches the agent the safe publishing workflow.",
+  "author": {
+    "name": "PinBridge"
+  },
+  "homepage": "https://www.pinbridge.io/mcp/",
+  "repository": "https://github.com/pinbridge/pinbridge-skill",
+  "license": "MIT",
+  "logo": "assets/logo.svg",
+  "keywords": [
+    "pinterest",
+    "pins",
+    "social-media",
+    "scheduling",
+    "mcp",
+    "pinbridge"
+  ],
+  "category": "integrations",
+  "tags": [
+    "pinterest",
+    "social-media",
+    "scheduling",
+    "mcp"
+  ],
+  "mcpServers": "./mcp.json"
+}

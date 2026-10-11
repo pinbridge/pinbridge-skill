@@ -1,6 +1,6 @@
-# PinBridge plugin for Claude
+# PinBridge plugin for Claude and Cursor
 
-Publish, schedule and track Pinterest pins by asking Claude. The plugin connects Claude to the hosted PinBridge MCP server and adds a skill that tells Claude how to use it: dry run first, confirm with you, then publish, and never post the same pin twice on a retry.
+Publish, schedule and track Pinterest pins by asking your assistant. The plugin connects Claude Code or Cursor to the hosted PinBridge MCP server and adds a skill that tells the assistant how to use it: dry run first, confirm with you, then publish, and never post the same pin twice on a retry.
 
 You need a PinBridge account with at least one Pinterest account connected in the [dashboard](https://app.pinbridge.io). The free Playground plan works with images at a public URL. Uploading images or videos from your computer, and bulk publishing, need a paid plan.
 
@@ -13,7 +13,15 @@ In Claude Code:
 /plugin install pinbridge@pinbridge
 ```
 
-The first time Claude calls a PinBridge tool, it opens a sign-in page. Log in, pick your workspace, and you're connected. There's no API key to paste. The key that sign-in creates shows up in your dashboard key list, and you can revoke it there any time.
+In Cursor, clone the repo into the local plugins folder:
+
+```
+git clone https://github.com/pinbridge/pinbridge-skill ~/.cursor/plugins/local/pinbridge
+```
+
+Then run "Developer: Reload Window". The skill and the `pinbridge` MCP server show up under Customize. On a Teams or Enterprise plan, an admin may have to allow local plugins first.
+
+The first time the assistant calls a PinBridge tool, it opens a sign-in page. Log in, pick your workspace, and you're connected. There's no API key to paste. The key that sign-in creates shows up in your dashboard key list, and you can revoke it there any time.
 
 Using a client without OAuth support? Point it at `https://mcp.pinbridge.io` and send a PinBridge API key as `Authorization: Bearer pb_...`. The [setup guide](https://www.pinbridge.io/docs/mcp/setup/) covers both ways.
 
@@ -26,26 +34,29 @@ Using a client without OAuth support? Point it at `https://mcp.pinbridge.io` and
 - "Which of last month's pins got the most clicks?"
 - "Move tomorrow's scheduled pin to the Dinner Ideas board and fix the typo in the title."
 
-Claude shows you the final title, description, link and board before anything goes out, and waits for your OK.
+The assistant shows you the final title, description, link and board before anything goes out, and waits for your OK.
 
-Pinterest doesn't let apps edit a pin once it's live. To correct a published pin, Claude offers to delete it and publish a fixed one, and asks you first.
+Pinterest doesn't let apps edit a pin once it's live. To correct a published pin, the assistant offers to delete it and publish a fixed one, and asks you first.
 
 ## What's in here
 
 ```
-.claude-plugin/plugin.json       plugin manifest
+.claude-plugin/plugin.json       Claude Code plugin manifest
 .claude-plugin/marketplace.json  lets Claude Code install it from this repo
-.mcp.json                        the PinBridge MCP server (https://mcp.pinbridge.io)
+.mcp.json                        the PinBridge MCP server, for Claude Code
+.cursor-plugin/plugin.json       Cursor plugin manifest
+mcp.json                         the PinBridge MCP server, for Cursor
+assets/logo.svg                  plugin logo
 skills/pinterest-publishing/     the publishing workflow, plus an error-code reference
 ```
 
-The plugin has no hooks and runs no local code. Everything goes through the hosted server, scoped to the workspace you sign in to.
+Both MCP files point at `https://mcp.pinbridge.io`. The plugin has no hooks and runs no local code. Everything goes through the hosted server, scoped to the workspace you sign in to.
 
 Connecting or disconnecting a Pinterest account stays in the dashboard. Pinterest needs you to approve that in a browser, and disconnecting drops every pending schedule on the account.
 
 ## Other assistants
 
-The skill in `skills/pinterest-publishing/` doesn't depend on Claude. It's plain Markdown written against the PinBridge MCP server, so any assistant that can connect to `https://mcp.pinbridge.io` and load skills or custom instructions can use it.
+The skill in `skills/pinterest-publishing/` doesn't depend on Claude or Cursor. It's plain Markdown written against the PinBridge MCP server, so any assistant that can connect to `https://mcp.pinbridge.io` and load skills or custom instructions can use it.
 
 ## Links
 
