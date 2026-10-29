@@ -30,9 +30,8 @@ The `pinbridge` MCP server does the Pinterest work: account tokens, queueing, re
 
 - Use `create_schedule` with `run_at` as ISO 8601 with a timezone offset. A time without an offset is rejected. If the user says "9am" and hasn't said where, ask for their timezone once.
 - Dry-run it the same way, and get a yes before the real call.
-- Schedules carry no alt text: `create_schedule` and `update_schedule` have no `alt_text` field. If alt text matters to the user, say so, and offer to publish at the chosen time with `create_pin` instead.
 - `create_schedule` has no idempotency key: a repeat call makes a second schedule. After a timeout, check `list_schedules` (search the title with `q`) before sending again.
-- Wrong time, board, copy or image on a pending schedule: `update_schedule`. Don't cancel and recreate for a small fix. Once a schedule has started publishing it fails with `schedule_not_editable`; treat the result like any published pin.
+- Wrong time, board, copy, alt text or image on a pending schedule: `update_schedule`. Don't cancel and recreate for a small fix. Once a schedule has started publishing it fails with `schedule_not_editable`; treat the result like any published pin.
 - The pin shouldn't go out at all: `cancel_schedule`, after the user confirms. `delete_schedule` only removes finished records (done, failed or canceled). It can't stop a pending schedule.
 - A failed schedule: `retry_schedule`. To move it to another board or account first, `retry_pin` on its `pin_id`.
 
@@ -48,7 +47,7 @@ The `pinbridge` MCP server does the Pinterest work: account tokens, queueing, re
 
 - **Title:** 100 characters max. Lead with what the pin is about, in words people search for.
 - **Description:** 800 characters max. Two or three plain sentences, with the main keywords worked in naturally. `list_related_terms` suggests terms people search for; use the ones that fit. No hashtag walls.
-- **Alt text:** describe the image for someone who can't see it, 500 characters max. Include it on every `create_pin` and batch entry.
+- **Alt text:** describe the image for someone who can't see it, 500 characters max. Include it on every `create_pin`, `create_schedule` and batch entry.
 - **Link:** the page the pin should send people to. Keep any UTM tags the user gives.
 - Write in the user's language and voice. If they gave you copy, use it as written and only point out limits it breaks.
 
