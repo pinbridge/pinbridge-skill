@@ -2,7 +2,7 @@
 
 Publish, schedule and track Pinterest pins by asking Claude. The plugin connects Claude to the hosted PinBridge MCP server and adds a skill that tells Claude how to use it: dry run first, confirm with you, then publish, and never post the same pin twice on a retry.
 
-You need a PinBridge account with at least one Pinterest account connected in the [dashboard](https://app.pinbridge.io). The free Playground plan works with images at a public URL. Uploading images or videos from your computer, and bulk publishing, need a paid plan.
+You need a PinBridge account with at least one Pinterest account connected in the [dashboard](https://app.pinbridge.io). The free Playground plan includes 25 pins a month and 5 image uploads a month; images at a public URL work too. Video uploads, more image uploads and bulk publishing need a paid plan.
 
 ## Install
 

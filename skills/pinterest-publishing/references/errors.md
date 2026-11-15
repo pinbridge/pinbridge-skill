@@ -44,7 +44,8 @@ Every failed call to the PinBridge MCP server carries a `code` and a `remediatio
 
 | Code | What it means | What to do |
 |---|---|---|
-| `feature_unavailable` | The workspace's plan doesn't include this feature, for example image uploads or bulk publishing. The free Playground plan has neither. | Uploads: ask for a public image URL instead. Bulk: publish with `create_pin` per pin, or schedule them. Or point the user to a paid plan. |
+| `feature_unavailable` | The workspace's plan doesn't include this feature, for example video uploads or bulk publishing. The free Playground plan has neither. | Videos: point the user to a paid plan. Bulk: publish with `create_pin` per pin, or schedule them. |
+| `image_upload_limit` | The free Playground plan has uploaded its 5 images this month. | Ask for a public image URL instead, wait for the reset date in the error, or point the user to a paid plan. |
 | `quota_exceeded` | The workspace used its monthly publishing quota. | Check `get_billing_status` for the reset date. Offer to schedule the pins after the reset, or point the user to a plan upgrade. |
 | `credits_exhausted` | The monthly quota is used up and no extra credits are left. | The user can buy a credit pack in the dashboard or wait for the monthly reset. |
 | `billing_inactive`, `payment_required` | Publishing is blocked by the plan or a payment problem. | The user needs to update their payment method or plan in the dashboard. Nothing to retry until then. |
