@@ -31,6 +31,7 @@ The `pinbridge` MCP server does the Pinterest work: account tokens, queueing, re
 - Use `create_schedule` with `run_at` as ISO 8601 with a timezone offset. A time without an offset is rejected. If the user says "9am" and hasn't said where, ask for their timezone once.
 - Dry-run it the same way, and get a yes before the real call.
 - `create_schedule` has no idempotency key: a repeat call makes a second schedule. After a timeout, check `list_schedules` (search the title with `q`) before sending again.
+- `create_schedule` and `update_schedule` can return `warnings`, for example an image link that may stop working before `run_at`. The schedule exists anyway; tell the user and offer the fix in `references/errors.md`.
 - Wrong time, board, copy, alt text or image on a pending schedule: `update_schedule`. Don't cancel and recreate for a small fix. Once a schedule has started publishing it fails with `schedule_not_editable`; treat the result like any published pin.
 - The pin shouldn't go out at all: `cancel_schedule`, after the user confirms. `delete_schedule` only removes finished records (done, failed or canceled). It can't stop a pending schedule.
 - A failed schedule: `retry_schedule`. To move it to another board or account first, `retry_pin` on its `pin_id`.
