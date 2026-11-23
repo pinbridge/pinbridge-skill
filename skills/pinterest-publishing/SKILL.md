@@ -1,6 +1,6 @@
 ---
 name: pinterest-publishing
-description: Publish, schedule, bulk-post, fix and measure Pinterest pins through the PinBridge MCP server. Use when the user wants to post a pin, schedule pins for later, spread a batch of pins over days, pick or create a board, move or cancel a scheduled pin, report how publishing went over a period, check how pins performed, or deal with a pin that failed, went out wrong or was deleted on Pinterest.
+description: Publish, schedule, bulk-post, fix and measure Pinterest pins through the PinBridge MCP server, including pins drawn from the user's PinBridge templates. Use when the user wants to post a pin, make a pin or a series of pins from a template, schedule pins for later, spread a batch of pins over days, pick or create a board, move or cancel a scheduled pin, report how publishing went over a period, check how pins performed, or deal with a pin that failed, went out wrong or was deleted on Pinterest.
 ---
 
 # Pinterest publishing with PinBridge
@@ -11,13 +11,13 @@ The `pinbridge` MCP server does the Pinterest work: account tokens, queueing, re
 
 - No PinBridge tools available: tell the user to add the PinBridge MCP server (`https://mcp.pinbridge.io`) to their assistant. The first call opens a PinBridge sign-in page; clients without sign-in support can send a PinBridge API key as `Authorization: Bearer pb_...` instead. Setup guide: https://www.pinbridge.io/docs/mcp/setup/
 - `list_pinterest_accounts` returns nothing: the user has to connect a Pinterest account in the dashboard at https://app.pinbridge.io. Connecting and disconnecting accounts is dashboard-only on purpose; don't look for a tool that does it.
-- Plan features: `get_billing_status` returns the monthly quota, what's used, and two feature flags. `uploaded_media_assets` covers `upload_asset`, `asset_id` and video pins. `bulk_imports` covers `create_pins_batch`. Both are off on the free Playground plan, which still uploads 5 images a month (no videos). A call that needs a missing feature fails with `feature_unavailable`. Check once before a task that depends on either feature.
+- Plan features: `get_billing_status` returns the monthly quota, what's used, and two feature flags. `uploaded_media_assets` covers `upload_asset`, `asset_id` and video pins. `bulk_imports` covers `create_pins_batch` for pins with an image; pins drawn from a template don't need it. Both are off on the free Playground plan, which still uploads 5 images a month (no videos). A call that needs a missing feature fails with `feature_unavailable`. Check once before a task that depends on either feature.
 
 ## Publish one pin now
 
 1. **Account.** `list_pinterest_accounts`. One account: use it. Several: ask which.
 2. **Board.** `list_boards(account_id)`. Suggest the board that fits the pin and confirm it. If the board is new to this session or a publish to it failed before, run `check_board_access` and follow its remediation. Only `create_board` when the user asks for a new board.
-3. **Image.** A public URL goes in as `image_url`. An image the user attached, one you generated, or a URL behind a login goes through `upload_asset` first (the exact file bytes as `content_base64`, or `source_url`), then `asset_id`. Pass one or the other, never both. On the free Playground plan, `upload_asset` takes 5 images a month; past that it fails with `image_upload_limit`, so ask the user for a public link to the image, or mention that paid plans accept more uploads. Video pins always need an uploaded asset and a cover image.
+3. **Image.** If the user wants the pin in one of their designs, follow "Pins from a template" below instead. A public URL goes in as `image_url`. An image the user attached, one you generated, or a URL behind a login goes through `upload_asset` first (the exact file bytes as `content_base64`, or `source_url`), then `asset_id`. Pass one or the other, never both. On the free Playground plan, `upload_asset` takes 5 images a month; past that it fails with `image_upload_limit`, so ask the user for a public link to the image, or mention that paid plans accept more uploads. Video pins always need an uploaded asset and a cover image.
 4. **Copy.** Draft it, following "Writing the pin" below.
 5. **Dry run.** `create_pin(..., dry_run=true)`. Show the user the resolved title, description, link, board and every check. A failed check means stop and fix the input. A `rate_paced` warning only means the publish will wait for Pinterest's rate limit; tell the user it may go out a little later.
 6. **Publish.** After the user confirms, call `create_pin` with the same arguments, `dry_run=false`, and `idempotency_key` set to `resolved.idempotency_key` from the dry run. Reuse that same key on any retry so the pin is never posted twice.
@@ -25,6 +25,26 @@ The `pinbridge` MCP server does the Pinterest work: account tokens, queueing, re
    - `published`: give the user the pin link.
    - `deferred`: PinBridge is pacing the publish because of quota or rate limits. Report the `error_code` and wait. Don't resubmit.
    - `failed`: read `error_code` and `error_message` (see `references/errors.md`). Bad copy: fix it with `update_pin`, then `retry_pin`. Bad board or account: `retry_pin` with a new `board_id` or `account_id`. A failed pin stays failed until `retry_pin` re-queues it.
+
+## Pins from a template
+
+PinBridge can draw the pin image from a template the user built or copied in the PinBridge app, so every pin comes out in their design: same layout, fonts and colors, with the text and photo changed. Templates are made in the app. There is no tool to create or edit one, so for a new layout, send the user to the app.
+
+1. **Find the template.** `list_templates`, with `q` for a name the user gives ("my Recipe card") or `niche` for a topic. `source="workspace"` lists only the user's own templates; `source="gallery"` lists templates other makers shared and PinBridge approved. Several match: show the names and ask. None: offer the gallery, or a pin from an image instead.
+2. **Read its inputs.** `get_template(template_id)` gives the size the pin is drawn at and each input: its type (`text`, `image` for a photo, `color`, `number`), label, limits, whether it's required, and its default. Write text inputs to fit `max_length`. An optional input with a default can be left out. `sample_inputs` show what the template's preview uses; their photo values name PinBridge's own sample photos, so never send them as the user's photo.
+3. **Fill the inputs.** Map the user's content to each input, for example the post title to the title input and their photo to the photo input, and ask for any required input that's missing. A photo input takes a public image URL, or `{"asset_id": "..."}` from `upload_asset`. Either can carry `focus` ([x, y], 0 to 1), `zoom` (1 to 3) and `flip`, as in `{"src": "https://...", "focus": [0.5, 0.3]}`. Colors are hex strings such as `"#D81E2F"`.
+4. **Write the pin as usual.** The template only makes the image. `title`, `description`, `link_url` and `alt_text` are still written as described in "Writing the pin". Describe the drawn pin in `alt_text`, including the text on it.
+5. **Dry run.** `create_pin` with `template_id`, `template_inputs` and `dry_run=true`, and without `image_url` or `asset_id`. The dry run draws the pin and reports its size, but returns no image to show the user. A failed `media` check with `template_inputs_invalid` lists each problem by input: fix those and dry-run again. Show the user the inputs, title, description, board and link, and get a yes.
+6. **Publish or schedule.** The same arguments with `dry_run=false` and `idempotency_key` set to `resolved.idempotency_key`, or `create_schedule` with `run_at`. A schedule's image is drawn when the schedule is created. For a series that must all look the same even if the template is edited, pass `template_version` from `get_template`.
+7. **Busy.** `render_busy` means every renderer is drawing other pins. Wait the seconds the error gives, then send the same call again with the same `idempotency_key`.
+
+A series from one template:
+
+- `create_pins_batch` takes entries with `template_id` and `template_inputs`. It draws and publishes them one at a time, a few seconds each, and doesn't need `bulk_imports`. Send about 10 entries per call, each with its own `idempotency_key`.
+- Entries the call had no time left for come back with status `not_sent`. Send those again in a new call with the same keys, after `retry_after_seconds` when the error gives it.
+- To spread a series over days, call `create_schedule` per pin instead, with the same template and a different `run_at`.
+
+`templates_not_available` means pin templates aren't turned on for this workspace yet. Offer a pin from an image instead.
 
 ## Schedule for later
 
@@ -38,7 +58,7 @@ The `pinbridge` MCP server does the Pinterest work: account tokens, queueing, re
 
 ## Several pins
 
-- Up to 100 pins at once: `create_pins_batch`. It needs `bulk_imports` and enough quota for every entry, so check `get_billing_status` first. Without the feature it fails with `feature_unavailable`; publish one by one with `create_pin` instead, or schedule them.
+- Up to 100 pins at once: `create_pins_batch`. Pins with an image need `bulk_imports` and enough quota for every entry, so check `get_billing_status` first. Without the feature it fails with `feature_unavailable`; publish one by one with `create_pin` instead, or schedule them. Pins drawn from a template go one at a time inside the call; see "Pins from a template".
 - Pinning a batch to the same board in one burst reads as spam to Pinterest. Offer to spread them with schedules, for example a few per day, and use `get_rate_meter(account_id)` to see the room left.
 - Give each entry its own `idempotency_key`. Without one, the server generates a key and a resend publishes the entry again.
 - Show the user the full list (board, time, title for each) before publishing a batch.
