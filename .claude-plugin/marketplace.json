@@ -1,6 +1,6 @@
 {
   "name": "pinbridge",
-  "description": "Official PinBridge plugin: publish and schedule Pinterest pins from Claude.",
+  "description": "Official PinBridge plugin: publish and schedule Pinterest pins from Claude, in your own pin templates.",
   "owner": {
     "name": "PinBridge",
     "url": "https://www.pinbridge.io"
@@ -9,8 +9,8 @@
     {
       "name": "pinbridge",
       "source": "./",
-      "description": "Publish, schedule and measure Pinterest pins from Claude through PinBridge. Connects the hosted PinBridge MCP server and teaches Claude the safe publishing workflow.",
-      "version": "0.2.3",
+      "description": "Publish, schedule and measure Pinterest pins from Claude through PinBridge, from your images or your pin templates. Connects the hosted PinBridge MCP server and teaches Claude the safe publishing workflow.",
+      "version": "0.3.0",
       "category": "productivity",
       "homepage": "https://www.pinbridge.io/mcp/"
     }

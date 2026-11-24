@@ -44,6 +44,19 @@ Every failed call to the PinBridge MCP server carries a `code` and a `remediatio
 | `pinterest_pin_link` | `link_url` is a pin that is already on Pinterest (`pinterest.com/pin/...`). Pinterest doesn't let apps save an existing pin again. Profile and board links are fine. | Use the website the idea comes from as the link, or publish without a link. To keep someone else's pin, the user clicks Save on it in Pinterest. |
 | `invalid_date_range`, `invalid_timezone` | A report's range is backwards or longer than 366 days, or the timezone isn't an IANA name. | Fix the range, or use a name like `Europe/Paris`. |
 
+### Templates
+
+| Code | What it means | What to do |
+|---|---|---|
+| `templates_not_available` | Pin templates aren't turned on for this workspace yet. | Make the pin from an image instead (`image_url` or `asset_id`). |
+| `template_inputs_invalid` | Some `template_inputs` don't fit the template. `problems` lists each one by input: `required`, `too_long`, `wrong_type`, `photo_unreachable` and similar. | Fix every listed input and dry-run again. `get_template` shows each input's type and limits. A `photo_unreachable` photo link needs a sign-in or is broken: use another link or upload the file with `upload_asset`. |
+| `template_not_found`, `template_version_not_found` | The template isn't in this workspace or the gallery, or has no such version. | Call `list_templates` again and use a current `template_id`. Leave `template_version` out to use the current version. |
+| `template_photos_too_large` | The photos are too large to draw together. | Send smaller photos; 2000 px on the long side is plenty. |
+| `template_image_unreadable` | A photo isn't an image PinBridge can read. | Use a PNG, JPEG or WebP image. |
+| `template_file_missing`, `template_not_drawable` | The template uses a font or image that was deleted, or this version can't be drawn. | The user fixes the template in the PinBridge app's template builder. Meanwhile, use another template or an image. |
+| `render_busy` | Every renderer is busy drawing other pins. | Wait the seconds the error gives, then send the same call again with the same `idempotency_key`. |
+| `render_unavailable` | Pins can't be drawn from templates right now. | Try again in a few minutes, or publish with an image instead. |
+
 ### Plan and billing
 
 | Code | What it means | What to do |

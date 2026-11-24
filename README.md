@@ -19,6 +19,7 @@ Using a client without OAuth support? Point it at `https://mcp.pinbridge.io` and
 
 ## What you can ask for
 
+- "Make a pin for this recipe with my Recipe card template."
 - "Pin this image to my Recipes board, linking to my post."
 - "Schedule these 20 pins over the next two weeks, two a day at 9am Casablanca time."
 - "Why did my last pin fail?"
@@ -27,6 +28,8 @@ Using a client without OAuth support? Point it at `https://mcp.pinbridge.io` and
 - "Move tomorrow's scheduled pin to the Dinner Ideas board and fix the typo in the title."
 
 Claude shows you the final title, description, link and board before anything goes out, and waits for your OK.
+
+Pin templates are designed in the PinBridge app, or copied from its gallery. Claude fills them in with your text and photos; it doesn't design new layouts.
 
 Pinterest doesn't let apps edit a pin once it's live. To correct a published pin, Claude offers to delete it and publish a fixed one, and asks you first.
 
